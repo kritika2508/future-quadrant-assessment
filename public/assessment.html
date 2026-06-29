@@ -317,10 +317,13 @@
           '<span class="shrink-0 font-semibold text-accent">' + (i + 1) + ".</span><span>" + q.text + "</span>";
         card.appendChild(legend);
 
+        const scale = document.createElement("div");
+        scale.className = "mx-auto w-full max-w-xl";
+
         const options = document.createElement("div");
         options.setAttribute("role", "radiogroup");
         options.setAttribute("aria-labelledby", "q" + i + "-label");
-        options.className = "mx-auto grid w-full max-w-xl grid-cols-5 gap-2 sm:gap-3";
+        options.className = "grid grid-cols-5 gap-2 sm:gap-3";
 
         LIKERT.forEach((opt) => {
           const id = "q" + i + "-" + opt.value;
@@ -333,10 +336,10 @@
 
           const label = document.createElement("label");
           label.htmlFor = id;
+          label.setAttribute("aria-label", opt.value + " - " + opt.label);
           label.className =
-            "flex h-full cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-navy-line bg-navy px-2 py-3 text-center text-xs leading-tight text-slate-300 transition hover:border-accent";
-          label.innerHTML =
-            '<span class="text-sm font-semibold">' + opt.value + "</span><span>" + opt.label + "</span>";
+            "flex aspect-square cursor-pointer items-center justify-center rounded-lg border border-navy-line bg-navy text-base font-semibold text-slate-300 transition hover:border-accent";
+          label.textContent = opt.value;
 
           input.addEventListener("change", updateProgress);
 
@@ -344,7 +347,15 @@
           options.appendChild(label);
         });
 
-        card.appendChild(options);
+        const anchors = document.createElement("div");
+        anchors.className =
+          "mt-3 flex items-center justify-between text-xs font-medium text-slate-400";
+        anchors.innerHTML =
+          '<span>Strongly Disagree</span><span>Strongly Agree</span>';
+
+        scale.appendChild(options);
+        scale.appendChild(anchors);
+        card.appendChild(scale);
         questionsContainer.appendChild(card);
       });
 
