@@ -1,0 +1,483 @@
+<!DOCTYPE html>
+<html lang="en" class="bg-[#0A192F]">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Future Quadrant Assessment</title>
+    <meta
+      name="description"
+      content="Discover whether you are a Definite Optimist, Indefinite Optimist, Definite Pessimist, or Indefinite Pessimist with the Future Quadrant Assessment."
+    />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=Inter:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              navy: "#0A192F",
+              "navy-soft": "#112A46",
+              "navy-line": "#1E3A5F",
+              accent: "#64D2C4",
+              "accent-soft": "#9BE3D9",
+            },
+            fontFamily: {
+              sans: ["Inter", "system-ui", "sans-serif"],
+              serif: ["Fraunces", "Georgia", "serif"],
+            },
+          },
+        },
+      };
+    </script>
+    <style>
+      html {
+        scroll-behavior: smooth;
+      }
+      .likert-radio:checked + label {
+        background-color: #64d2c4;
+        color: #0a192f;
+        border-color: #64d2c4;
+        font-weight: 600;
+      }
+      .fade-in {
+        animation: fadeIn 0.6s ease both;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(12px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      .dot-pop {
+        animation: dotPop 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) 0.2s both;
+      }
+      @keyframes dotPop {
+        from {
+          transform: translate(-50%, 50%) scale(0);
+        }
+        to {
+          transform: translate(-50%, 50%) scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body class="bg-navy text-white font-sans antialiased">
+    <div class="mx-auto max-w-4xl px-5 py-10 sm:px-8 sm:py-16">
+      <!-- ===================== QUIZ VIEW ===================== -->
+      <section id="quiz-view">
+        <header class="mb-10 text-center">
+          <p class="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-accent">
+            Psychology Assessment
+          </p>
+          <h1 class="font-serif text-4xl font-semibold leading-tight text-balance sm:text-5xl">
+            The Future Quadrant Assessment
+          </h1>
+          <p class="mx-auto mt-4 max-w-xl text-pretty leading-relaxed text-slate-300">
+            Rate how strongly you agree with each statement. There are no right or
+            wrong answers &mdash; respond with your honest, instinctive reaction to
+            reveal how you relate to the future.
+          </p>
+        </header>
+
+        <!-- progress -->
+        <div class="sticky top-0 z-10 -mx-5 mb-8 bg-navy/90 px-5 py-3 backdrop-blur sm:-mx-8 sm:px-8">
+          <div class="flex items-center justify-between text-sm text-slate-300">
+            <span>Progress</span>
+            <span><span id="answered-count">0</span> / 16 answered</span>
+          </div>
+          <div class="mt-2 h-2 w-full overflow-hidden rounded-full bg-navy-line">
+            <div id="progress-bar" class="h-full w-0 rounded-full bg-accent transition-all duration-300"></div>
+          </div>
+        </div>
+
+        <form id="quiz-form" class="space-y-5">
+          <div id="questions-container" class="space-y-5"></div>
+
+          <p id="validation-msg" class="hidden rounded-lg border border-red-400/40 bg-red-500/10 px-4 py-3 text-sm text-red-200"></p>
+
+          <button
+            type="submit"
+            class="w-full rounded-xl bg-accent px-6 py-4 text-base font-semibold text-navy transition hover:bg-accent-soft focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-navy"
+          >
+            Reveal My Quadrant
+          </button>
+        </form>
+      </section>
+
+      <!-- ===================== RESULT VIEW ===================== -->
+      <section id="result-view" class="hidden">
+        <header class="mb-8 text-center fade-in">
+          <p class="mb-3 text-xs font-semibold uppercase tracking-[0.25em] text-accent">
+            Your Result
+          </p>
+          <h2
+            id="quadrant-title"
+            class="font-serif text-4xl font-semibold leading-tight text-balance sm:text-6xl"
+          ></h2>
+          <p id="quadrant-tagline" class="mx-auto mt-4 max-w-xl text-pretty text-lg leading-relaxed text-slate-300"></p>
+        </header>
+
+        <!-- scores + graph -->
+        <div class="grid gap-6 md:grid-cols-2">
+          <!-- numeric breakdown -->
+          <div class="rounded-2xl border border-navy-line bg-navy-soft p-6 fade-in">
+            <h3 class="mb-5 font-serif text-xl font-semibold">Score Breakdown</h3>
+
+            <div class="mb-5">
+              <div class="mb-2 flex items-baseline justify-between">
+                <span class="text-sm font-medium text-slate-300">Optimism</span>
+                <span class="font-serif text-2xl font-semibold text-accent"><span id="opt-score">0.0</span><span class="text-base text-slate-400">/5</span></span>
+              </div>
+              <div class="h-2.5 w-full overflow-hidden rounded-full bg-navy-line">
+                <div id="opt-bar" class="h-full w-0 rounded-full bg-accent transition-all duration-700"></div>
+              </div>
+            </div>
+
+            <div>
+              <div class="mb-2 flex items-baseline justify-between">
+                <span class="text-sm font-medium text-slate-300">Definiteness</span>
+                <span class="font-serif text-2xl font-semibold text-accent"><span id="def-score">0.0</span><span class="text-base text-slate-400">/5</span></span>
+              </div>
+              <div class="h-2.5 w-full overflow-hidden rounded-full bg-navy-line">
+                <div id="def-bar" class="h-full w-0 rounded-full bg-accent transition-all duration-700"></div>
+              </div>
+            </div>
+
+            <p class="mt-6 border-t border-navy-line pt-4 text-sm leading-relaxed text-slate-400">
+              The midpoint for each axis is <span class="font-semibold text-slate-200">3.0</span>.
+              Scores above the midpoint are considered high; scores below are considered low.
+            </p>
+          </div>
+
+          <!-- 2x2 quadrant graph -->
+          <div class="rounded-2xl border border-navy-line bg-navy-soft p-6 fade-in">
+            <h3 class="mb-5 font-serif text-xl font-semibold">Your Position</h3>
+            <div class="relative">
+              <!-- y axis label -->
+              <div class="absolute -left-1 top-1/2 -translate-y-1/2 -rotate-90 text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                Optimism &rarr;
+              </div>
+              <div class="pl-6">
+                <div
+                  id="quadrant-grid"
+                  class="relative aspect-square w-full overflow-hidden rounded-xl border border-navy-line"
+                >
+                  <!-- four cells -->
+                  <div class="grid h-full w-full grid-cols-2 grid-rows-2">
+                    <div data-cell="indefinite-optimist" class="flex items-start justify-start p-2 text-[10px] font-medium leading-tight text-slate-400 border-b border-r border-navy-line sm:text-xs">Indefinite<br>Optimist</div>
+                    <div data-cell="definite-optimist" class="flex items-start justify-end p-2 text-right text-[10px] font-medium leading-tight text-slate-400 border-b border-navy-line sm:text-xs">Definite<br>Optimist</div>
+                    <div data-cell="indefinite-pessimist" class="flex items-end justify-start p-2 text-[10px] font-medium leading-tight text-slate-400 border-r border-navy-line sm:text-xs">Indefinite<br>Pessimist</div>
+                    <div data-cell="definite-pessimist" class="flex items-end justify-end p-2 text-right text-[10px] font-medium leading-tight text-slate-400 sm:text-xs">Definite<br>Pessimist</div>
+                  </div>
+                  <!-- center cross -->
+                  <div class="pointer-events-none absolute inset-x-0 top-1/2 h-px -translate-y-1/2 bg-navy-line"></div>
+                  <div class="pointer-events-none absolute inset-y-0 left-1/2 w-px -translate-x-1/2 bg-navy-line"></div>
+                  <!-- plot dot -->
+                  <div
+                    id="plot-dot"
+                    class="dot-pop absolute z-10 h-5 w-5 rounded-full border-2 border-navy bg-accent shadow-[0_0_0_6px_rgba(100,210,196,0.25)]"
+                    style="left: 50%; bottom: 50%;"
+                  >
+                    <span class="absolute left-1/2 top-1/2 h-1.5 w-1.5 -translate-x-1/2 -translate-y-1/2 rounded-full bg-navy"></span>
+                  </div>
+                </div>
+                <!-- x axis label -->
+                <div class="mt-2 text-center text-[10px] font-semibold uppercase tracking-widest text-slate-400">
+                  Definiteness &rarr;
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- explanation -->
+        <div class="mt-6 rounded-2xl border border-navy-line bg-navy-soft p-6 sm:p-8 fade-in">
+          <h3 class="mb-3 font-serif text-2xl font-semibold">What This Means</h3>
+          <p id="quadrant-explanation" class="text-pretty leading-relaxed text-slate-300"></p>
+
+          <h3 class="mb-4 mt-8 font-serif text-2xl font-semibold">Recommendations</h3>
+          <ul id="quadrant-recommendations" class="space-y-3"></ul>
+        </div>
+
+        <button
+          id="retake-btn"
+          type="button"
+          class="mt-8 w-full rounded-xl border border-navy-line bg-transparent px-6 py-4 text-base font-semibold text-white transition hover:bg-navy-soft focus:outline-none focus:ring-2 focus:ring-accent focus:ring-offset-2 focus:ring-offset-navy"
+        >
+          Retake the Assessment
+        </button>
+      </section>
+
+      <footer class="mt-12 text-center text-xs text-slate-500">
+        For self-reflection only. Not a clinical or diagnostic instrument.
+      </footer>
+    </div>
+
+    <script>
+      // ---------- Questions ----------
+      // dimension: "optimism" | "definiteness"
+      const QUESTIONS = [
+        { dimension: "optimism", text: "I generally expect good things to happen in my future." },
+        { dimension: "definiteness", text: "I have a clear, concrete plan for where I want to be in five years." },
+        { dimension: "optimism", text: "When I face a setback, I believe things will work out in the end." },
+        { dimension: "definiteness", text: "I prefer setting specific goals rather than keeping my options open." },
+        { dimension: "optimism", text: "I tend to look on the bright side of difficult situations." },
+        { dimension: "definiteness", text: "I follow detailed steps to reach my long-term objectives." },
+        { dimension: "optimism", text: "I am confident that my best days are still ahead of me." },
+        { dimension: "definiteness", text: "I believe the future can be shaped through deliberate planning." },
+        { dimension: "optimism", text: "I rarely worry that things will go badly for me." },
+        { dimension: "definiteness", text: "I know exactly what success looks like for me." },
+        { dimension: "optimism", text: "I trust that effort today will lead to a brighter tomorrow." },
+        { dimension: "definiteness", text: "I map out my decisions well in advance rather than improvising." },
+        { dimension: "optimism", text: "I feel hopeful when I think about the years to come." },
+        { dimension: "definiteness", text: "I commit firmly to a single path once I have chosen it." },
+        { dimension: "optimism", text: "I believe most challenges I face will ultimately turn out fine." },
+        { dimension: "definiteness", text: "I design my life around concrete milestones and deadlines." },
+      ];
+
+      const LIKERT = [
+        { value: 1, label: "Strongly Disagree" },
+        { value: 2, label: "Disagree" },
+        { value: 3, label: "Neutral" },
+        { value: 4, label: "Agree" },
+        { value: 5, label: "Strongly Agree" },
+      ];
+
+      const MEDIAN = 3.0;
+
+      const QUADRANTS = {
+        "definite-optimist": {
+          title: "Definite Optimist",
+          tagline: "You believe the future will be better — and that you can actively build it.",
+          explanation:
+            "As a Definite Optimist, you combine genuine hope about what's coming with a firm conviction that the future can be designed and shaped. You don't just expect good outcomes; you make concrete plans to bring them about. This mindset has historically driven inventors, founders, and long-term builders. Your strength is turning optimism into a roadmap, though it's worth staying flexible when reality diverges from the plan.",
+          recommendations: [
+            "Channel your optimism into a single ambitious, multi-year project and break it into concrete milestones.",
+            "Schedule quarterly reviews to test your plan against reality and adjust course without abandoning the vision.",
+            "Surround yourself with people who execute, so your definite plans translate into tangible progress.",
+          ],
+        },
+        "indefinite-optimist": {
+          title: "Indefinite Optimist",
+          tagline: "You expect the future to be bright, but prefer to keep your options open.",
+          explanation:
+            "As an Indefinite Optimist, you feel positive about what lies ahead yet resist locking yourself into rigid plans. You value adaptability and trust that opportunities will appear. This makes you resilient and open-minded, but optimism without a concrete plan can drift into wishful thinking. Your growth lies in pairing your natural hope with a bit more deliberate direction.",
+          recommendations: [
+            "Pick one area of life and define a specific 12-month goal to practice turning hope into a plan.",
+            "Write down what 'a great outcome' concretely looks like, so your optimism has a target.",
+            "Set small commitment deadlines to counter the tendency to keep every door open indefinitely.",
+          ],
+        },
+        "definite-pessimist": {
+          title: "Definite Pessimist",
+          tagline: "You expect a tougher future, and you prepare for it with careful planning.",
+          explanation:
+            "As a Definite Pessimist, you tend to anticipate difficulty, and you respond by planning meticulously to protect against it. You are disciplined, prudent, and rarely caught off guard. This caution is a real asset for risk management and resilience. The flip side is that constant defensiveness can crowd out opportunity — your growth comes from allowing room for upside, not just protection from downside.",
+          recommendations: [
+            "For each risk you plan against, deliberately note one potential opportunity you could pursue.",
+            "Practice 'best-case' planning occasionally to balance your strong instinct for worst-case scenarios.",
+            "Celebrate completed preparations as wins, then take one calculated, hopeful risk each quarter.",
+          ],
+        },
+        "indefinite-pessimist": {
+          title: "Indefinite Pessimist",
+          tagline: "You sense the future may be difficult, and the path forward feels uncertain.",
+          explanation:
+            "As an Indefinite Pessimist, you expect challenges ahead but feel unsure how to prepare for them. This can lead to a sense of being stuck or reactive rather than in control. The encouraging news is that this is the most changeable quadrant: building even small amounts of structure and hope creates outsized improvements. Your growth begins with reclaiming a sense of agency over your future.",
+          recommendations: [
+            "Start with one tiny, controllable daily habit to rebuild a sense of agency over outcomes.",
+            "Keep an evidence journal of times things turned out better than feared to gently challenge pessimism.",
+            "Choose one concrete short-term goal with a clear deadline to replace open-ended uncertainty with direction.",
+          ],
+        },
+      };
+
+      // ---------- Build quiz ----------
+      const questionsContainer = document.getElementById("questions-container");
+
+      QUESTIONS.forEach((q, i) => {
+        const card = document.createElement("fieldset");
+        card.className =
+          "rounded-2xl border border-navy-line bg-navy-soft p-5 sm:p-6 transition";
+        card.dataset.index = i;
+
+        const legend = document.createElement("legend");
+        legend.className = "mb-4 block text-base font-medium leading-relaxed text-white";
+        legend.innerHTML =
+          '<span class="mr-2 text-accent">' + (i + 1) + ".</span>" + q.text;
+        card.appendChild(legend);
+
+        const options = document.createElement("div");
+        options.className = "grid grid-cols-1 gap-2 sm:grid-cols-5";
+
+        LIKERT.forEach((opt) => {
+          const id = "q" + i + "-" + opt.value;
+          const input = document.createElement("input");
+          input.type = "radio";
+          input.name = "q" + i;
+          input.id = id;
+          input.value = opt.value;
+          input.className = "likert-radio sr-only";
+
+          const label = document.createElement("label");
+          label.htmlFor = id;
+          label.className =
+            "flex h-full cursor-pointer flex-col items-center justify-center gap-1 rounded-lg border border-navy-line bg-navy px-2 py-3 text-center text-xs leading-tight text-slate-300 transition hover:border-accent";
+          label.innerHTML =
+            '<span class="text-sm font-semibold">' + opt.value + "</span><span>" + opt.label + "</span>";
+
+          input.addEventListener("change", updateProgress);
+
+          options.appendChild(input);
+          options.appendChild(label);
+        });
+
+        card.appendChild(options);
+        questionsContainer.appendChild(card);
+      });
+
+      // ---------- Progress ----------
+      function getAnsweredCount() {
+        let count = 0;
+        for (let i = 0; i < QUESTIONS.length; i++) {
+          if (document.querySelector('input[name="q' + i + '"]:checked')) count++;
+        }
+        return count;
+      }
+
+      function updateProgress() {
+        const count = getAnsweredCount();
+        document.getElementById("answered-count").textContent = count;
+        document.getElementById("progress-bar").style.width =
+          (count / QUESTIONS.length) * 100 + "%";
+      }
+
+      // ---------- Submit ----------
+      const form = document.getElementById("quiz-form");
+      const validationMsg = document.getElementById("validation-msg");
+
+      form.addEventListener("submit", (e) => {
+        e.preventDefault();
+
+        const answers = [];
+        let firstUnanswered = -1;
+        for (let i = 0; i < QUESTIONS.length; i++) {
+          const checked = document.querySelector('input[name="q' + i + '"]:checked');
+          if (!checked) {
+            if (firstUnanswered === -1) firstUnanswered = i;
+            answers.push(null);
+          } else {
+            answers.push(Number(checked.value));
+          }
+        }
+
+        if (firstUnanswered !== -1) {
+          const remaining = QUESTIONS.length - getAnsweredCount();
+          validationMsg.textContent =
+            "Please answer all questions before submitting. You have " +
+            remaining +
+            " left.";
+          validationMsg.classList.remove("hidden");
+          const card = questionsContainer.querySelector(
+            '[data-index="' + firstUnanswered + '"]'
+          );
+          if (card) card.scrollIntoView({ behavior: "smooth", block: "center" });
+          return;
+        }
+        validationMsg.classList.add("hidden");
+
+        // averages
+        let optSum = 0, optN = 0, defSum = 0, defN = 0;
+        QUESTIONS.forEach((q, i) => {
+          if (q.dimension === "optimism") { optSum += answers[i]; optN++; }
+          else { defSum += answers[i]; defN++; }
+        });
+        const optAvg = optSum / optN;
+        const defAvg = defSum / defN;
+
+        const highOpt = optAvg >= MEDIAN;
+        const highDef = defAvg >= MEDIAN;
+
+        let key;
+        if (highOpt && highDef) key = "definite-optimist";
+        else if (highOpt && !highDef) key = "indefinite-optimist";
+        else if (!highOpt && highDef) key = "definite-pessimist";
+        else key = "indefinite-pessimist";
+
+        renderResult(key, optAvg, defAvg);
+      });
+
+      // ---------- Render result ----------
+      function renderResult(key, optAvg, defAvg) {
+        const data = QUADRANTS[key];
+
+        document.getElementById("quadrant-title").textContent = data.title;
+        document.getElementById("quadrant-tagline").textContent = data.tagline;
+        document.getElementById("quadrant-explanation").textContent = data.explanation;
+
+        document.getElementById("opt-score").textContent = optAvg.toFixed(1);
+        document.getElementById("def-score").textContent = defAvg.toFixed(1);
+
+        const recList = document.getElementById("quadrant-recommendations");
+        recList.innerHTML = "";
+        data.recommendations.forEach((rec) => {
+          const li = document.createElement("li");
+          li.className = "flex items-start gap-3 text-slate-300";
+          li.innerHTML =
+            '<span class="mt-0.5 flex h-6 w-6 flex-none items-center justify-center rounded-full bg-accent/15 text-sm font-semibold text-accent">&#10003;</span>' +
+            '<span class="leading-relaxed">' + rec + "</span>";
+          recList.appendChild(li);
+        });
+
+        // bars
+        document.getElementById("opt-bar").style.width = (optAvg / 5) * 100 + "%";
+        document.getElementById("def-bar").style.width = (defAvg / 5) * 100 + "%";
+
+        // plot dot: x = definiteness, y = optimism. Scale 1..5 -> 0..100%
+        const xPct = ((defAvg - 1) / 4) * 100;
+        const yPct = ((optAvg - 1) / 4) * 100;
+        const dot = document.getElementById("plot-dot");
+        dot.style.left = xPct + "%";
+        dot.style.bottom = yPct + "%";
+
+        // highlight active cell
+        document.querySelectorAll("#quadrant-grid [data-cell]").forEach((cell) => {
+          if (cell.dataset.cell === key) {
+            cell.classList.add("bg-accent/10", "text-accent");
+            cell.classList.remove("text-slate-400");
+          } else {
+            cell.classList.remove("bg-accent/10", "text-accent");
+            cell.classList.add("text-slate-400");
+          }
+        });
+
+        // restart dot animation
+        dot.classList.remove("dot-pop");
+        void dot.offsetWidth;
+        dot.classList.add("dot-pop");
+
+        document.getElementById("quiz-view").classList.add("hidden");
+        document.getElementById("result-view").classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      // ---------- Retake ----------
+      document.getElementById("retake-btn").addEventListener("click", () => {
+        form.reset();
+        updateProgress();
+        document.getElementById("result-view").classList.add("hidden");
+        document.getElementById("quiz-view").classList.remove("hidden");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      });
+    </script>
+  </body>
+</html>
