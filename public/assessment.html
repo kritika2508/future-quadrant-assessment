@@ -312,15 +312,15 @@
 
         const legend = document.createElement("p");
         legend.id = "q" + i + "-label";
-        legend.className = "mb-6 block w-full text-left text-base font-medium leading-relaxed text-white";
+        legend.className = "mx-auto mb-6 flex w-full max-w-xl items-baseline gap-2 text-left text-base font-medium leading-relaxed text-white";
         legend.innerHTML =
-          '<span class="mr-2 text-accent">' + (i + 1) + ".</span>" + q.text;
+          '<span class="shrink-0 font-semibold text-accent">' + (i + 1) + ".</span><span>" + q.text + "</span>";
         card.appendChild(legend);
 
         const options = document.createElement("div");
         options.setAttribute("role", "radiogroup");
         options.setAttribute("aria-labelledby", "q" + i + "-label");
-        options.className = "mx-auto grid w-full max-w-xl grid-cols-5 gap-2";
+        options.className = "mx-auto grid w-full max-w-xl grid-cols-5 gap-2 sm:gap-3";
 
         LIKERT.forEach((opt) => {
           const id = "q" + i + "-" + opt.value;
