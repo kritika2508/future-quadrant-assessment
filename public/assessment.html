@@ -310,13 +310,16 @@
           "rounded-2xl border border-navy-line bg-navy-soft p-6 sm:p-8 transition";
         card.dataset.index = i;
 
-        const legend = document.createElement("legend");
-        legend.className = "mb-5 block text-left text-base font-medium leading-relaxed text-white";
+        const legend = document.createElement("p");
+        legend.id = "q" + i + "-label";
+        legend.className = "mb-6 block w-full text-left text-base font-medium leading-relaxed text-white";
         legend.innerHTML =
           '<span class="mr-2 text-accent">' + (i + 1) + ".</span>" + q.text;
         card.appendChild(legend);
 
         const options = document.createElement("div");
+        options.setAttribute("role", "radiogroup");
+        options.setAttribute("aria-labelledby", "q" + i + "-label");
         options.className = "mx-auto grid w-full max-w-xl grid-cols-5 gap-2";
 
         LIKERT.forEach((opt) => {
